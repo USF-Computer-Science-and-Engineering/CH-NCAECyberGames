@@ -3,7 +3,7 @@ export DEBIAN_FRONTEND=noninteractive
 #set -x # THIS IS FOR DEBUG PURPOSES. LEAVE DISABLED
 
 # REPLACE THIS HASH WITH THE ONE THEY PROVIDE. THIS IS JUST THE ONE FROM NOTION
-secure_hash='$6$KHk2hJlrIZKWxWA9$z2OrpVg05wxoUp/BL12VY9rvxvgyZhta.qKf9SwckeNMcW4QvCJACSA4QyBwy88UpPAGDrskbu7rb7sh8fbnM1'
+secure_hash='$6$iB45nMgzciz4NZ6A$hus0EIqQG7K/W3LmpC9qbhlB5B1q6KcXExvrAv1vfL3XbvLtU92ItaB0E3nmRh1HUYQxWydEUFkbgjSGqgpl0/'
 filename="$1"
 filepath=$(readlink -f "$filename")
 
@@ -28,7 +28,7 @@ while read -r user; do
 
     # If user does NOT exist
     if ! id "$user" &>/dev/null; then
-        sudo useradd -M "$user"
+        sudo useradd -m "$user"
         echo "$user:$secure_hash" | sudo chpasswd -e
         echo "  Created user: $user with predefined hash."
     else
