@@ -1,6 +1,6 @@
 #!/bin/bash
 # ----------------------------------------------------------------------
-# VSFTPD HARDENING SCRIPT (Debian-based systems with systemd)
+# VSFTPD HARDENING SCRIPT (RedHat specific systems with systemd)
 # ----------------------------------------------------------------------
 # Description:
 #   - For vsftpd, anonymous login is disabled by default.
