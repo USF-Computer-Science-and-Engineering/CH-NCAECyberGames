@@ -22,3 +22,6 @@ sudo sed -i "s|#AuthorizedKeysFile.*|AuthorizedKeysFile	.ssh/authorized_keys .ss
 
 # grep output to confirm changes
 sudo cat /etc/ssh/sshd_config | grep -e "MaxSessions" -e "MaxAuthTries" -e "PubkeyAuthentication" -e "PasswordAuthentication" -e "PermitRootLogin" -e "AuthorizedKeysFile"
+
+# restart openssh to load changes
+sudo systemctl restart sshd.service
