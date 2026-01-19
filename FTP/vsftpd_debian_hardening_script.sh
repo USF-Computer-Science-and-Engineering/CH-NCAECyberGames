@@ -11,7 +11,6 @@
 #   - Must be run with root privileges (sudo or as root).
 #   - Assumes that all FTP login users are local users.
 #   - The userlist file will be readable/writable only by root.
-#   - Consider creating a ftp_users group that  owns /mnt/files and nobody else can read those files (TODO)
 # ----------------------------------------------------------------------
 
 # Ensure an argument is provided
@@ -47,9 +46,9 @@ sudo sed -i "s|.*write_enable.*|write_enable=YES|g" /etc/vsftpd.conf
 echo -e "COMPLETE\n"
 
 # --- CREATE USERLIST FILE ---
-echo -e "\n[+] Creating userlist file: /etc/vsftpd.userlist"
-sudo touch /etc/vsftpd.userlist
-sudo chmod 600 /etc/vsftpd.userlist
+echo -e "\n[+] Creating userlist file: /etc/vsftpd/user_list"
+sudo touch /etc/vsftpd/user_list
+sudo chmod 600 /etc/vsftpd/user_list
 echo "[+] Permissions set to root read/write only."
 echo -e "COMPLETE\n"
 
@@ -73,7 +72,16 @@ echo -e "COMPLETE\n"
 
 # --- MAKE SURE FTP_USERS GROUP CAN READ FILES CREATED BY SCORING USERS ---
 echo -e "\n[+] Making sure ftp_users group can read files created by other scoring users"
-sudo echo "local_umask=007" >> /etc/vsftpd.conf
+# Check if local_umask already exists in the config file
+if grep -q "^local_umask" /etc/vsftpd.conf; then
+    # If it exists, change it to local_umask=007
+    sudo sed -i "s|^local_umask.*|local_umask=007|g" /etc/vsftpd.conf
+    echo -e "local_umask updated to 007"
+else
+    # If it doesn't exist, add it at the end of the file
+    echo "local_umask=007" | sudo tee -a /etc/vsftpd.conf > /dev/null
+    echo -e "local_umask added to vsftpd.conf"
+fi
 echo -e "COMPLETE\n"
 
 # --- READ AND APPEND USERLIST ENTRIES ---
@@ -81,20 +89,20 @@ filename="$1"
 filepath=$(readlink -f "$filename")
 
 echo -e "[+] Reading usernames from: $filepath"
-echo -e "[+] Adding usernames to /etc/vsftpd.userlist"
+echo -e "[+] Adding usernames to /etc/vsftpd/user_list"
 while read -r user; do
-    echo "$user" | sudo tee -a /etc/vsftpd.userlist > /dev/null
+    echo "$user" | sudo tee -a /etc/vsftpd/user_list > /dev/null
 done < "$filepath"
 echo -e "COMPLETE\n"
 
 # --- DISPLAY USERLIST FOR CONFIRMATION ---
 echo "[+] vsftpd.userlist contents:"
-sudo cat /etc/vsftpd.userlist
+sudo cat /etc/vsftpd/user_list
 echo -e "\n"
 
 # --- ENABLE USERLIST IN VSFTPD CONFIGURATION ---
 echo "[+] Enabling userlist feature in /etc/vsftpd.conf"
-echo -e "userlist_enable=YES\nuserlist_file=/etc/vsftpd.userlist\nuserlist_deny=NO" \
+echo -e "userlist_enable=YES\nuserlist_file=/etc/vsftpd/user_list\nuserlist_deny=NO" \
 | sudo tee -a /etc/vsftpd.conf > /dev/null
 echo -e "COMPLETE\n"
 
