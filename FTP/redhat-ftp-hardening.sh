@@ -79,8 +79,18 @@ echo -e "COMPLETE\n"
 
 # --- MAKE SURE FTP_USERS GROUP CAN READ FILES CREATED BY SCORING USERS ---
 echo -e "\n[+] Making sure ftp_users group can read files created by other scoring users"
-sudo sed -i "s|.*local_umask.*|local_umask=007|g" /etc/vsftpd/vsftpd.conf
+# Check if local_umask already exists in the config file
+if grep -q "^local_umask" /etc/vsftpd/vsftpd.conf; then
+    # If it exists, change it to local_umask=007
+    sudo sed -i "s|^local_umask.*|local_umask=007|g" /etc/vsftpd/vsftpd.conf
+    echo -e "local_umask updated to 007"
+else
+    # If it doesn't exist, add it at the end of the file
+    echo "local_umask=007" | sudo tee -a /etc/vsftpd/vsftpd.conf > /dev/null
+    echo -e "local_umask added to vsftpd.conf"
+fi
 echo -e "COMPLETE\n"
+
 
 # --- READ AND APPEND USERLIST ENTRIES ---
 filename="$1"
