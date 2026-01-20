@@ -46,9 +46,9 @@ sudo sed -i "s|.*write_enable.*|write_enable=YES|g" /etc/vsftpd.conf
 echo -e "COMPLETE\n"
 
 # --- CREATE USERLIST FILE ---
-echo -e "\n[+] Creating userlist file: /etc/vsftpd/user_list"
-sudo touch /etc/vsftpd/user_list
-sudo chmod 600 /etc/vsftpd/user_list
+echo -e "\n[+] Creating userlist file: /etc/user_list"
+sudo touch /etc/vsftpd.userlist
+sudo chmod 600 /etc/vsftpd.userlist
 echo "[+] Permissions set to root read/write only."
 echo -e "COMPLETE\n"
 
@@ -89,15 +89,15 @@ filename="$1"
 filepath=$(readlink -f "$filename")
 
 echo -e "[+] Reading usernames from: $filepath"
-echo -e "[+] Adding usernames to /etc/vsftpd/user_list"
+echo -e "[+] Adding usernames to /etc/vsftpd.userlist"
 while read -r user; do
-    echo "$user" | sudo tee -a /etc/vsftpd/user_list > /dev/null
+    echo "$user" | sudo tee -a /etc/vsftpd.userlist > /dev/null
 done < "$filepath"
 echo -e "COMPLETE\n"
 
 # --- DISPLAY USERLIST FOR CONFIRMATION ---
 echo "[+] vsftpd.userlist contents:"
-sudo cat /etc/vsftpd/user_list
+sudo cat /etc/vsftpd.userlist
 echo -e "\n"
 
 # --- ENABLE USERLIST IN VSFTPD CONFIGURATION ---
@@ -115,3 +115,4 @@ echo -e "\n"
 echo "[+] Restarting vsftpd service..."
 sudo systemctl restart vsftpd.service
 echo "[+] COMPLETE"
+
