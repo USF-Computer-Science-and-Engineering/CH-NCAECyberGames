@@ -102,7 +102,7 @@ echo -e "\n"
 
 # --- ENABLE USERLIST IN VSFTPD CONFIGURATION ---
 echo "[+] Enabling userlist feature in /etc/vsftpd.conf"
-echo -e "userlist_enable=YES\nuserlist_file=/etc/vsftpd/user_list\nuserlist_deny=NO" \
+echo -e "userlist_enable=YES\nuserlist_file=/etc/vsftpd.userlist\nuserlist_deny=NO" \
 | sudo tee -a /etc/vsftpd.conf > /dev/null
 echo -e "COMPLETE\n"
 
@@ -115,5 +115,6 @@ echo -e "\n"
 echo "[+] Restarting vsftpd service..."
 sudo systemctl restart vsftpd.service
 echo "[+] COMPLETE"
+
 
 
