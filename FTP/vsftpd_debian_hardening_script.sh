@@ -46,7 +46,7 @@ sudo sed -i "s|.*write_enable.*|write_enable=YES|g" /etc/vsftpd.conf
 echo -e "COMPLETE\n"
 
 # --- CREATE USERLIST FILE ---
-echo -e "\n[+] Creating userlist file: /etc/user_list"
+echo -e "\n[+] Creating userlist file: /etc/vsftpd.userlist"
 sudo touch /etc/vsftpd.userlist
 sudo chmod 600 /etc/vsftpd.userlist
 echo "[+] Permissions set to root read/write only."
@@ -115,4 +115,5 @@ echo -e "\n"
 echo "[+] Restarting vsftpd service..."
 sudo systemctl restart vsftpd.service
 echo "[+] COMPLETE"
+
 
