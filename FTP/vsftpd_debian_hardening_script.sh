@@ -106,6 +106,10 @@ echo -e "userlist_enable=YES\nuserlist_file=/etc/vsftpd.userlist\nuserlist_deny=
 | sudo tee -a /etc/vsftpd.conf > /dev/null
 echo -e "COMPLETE\n"
 
+echo "[+] Enabling full FTP logging in /etc/vsftpd.conf"
+echo "log_ftp_protocol=YES" >> /etc/vsftpd.conf
+echo -e "COMPELTE\n"
+
 # --- DISPLAY CONFIRMATION OF CONFIG UPDATE ---
 echo "[+] Last five lines of /etc/vsftpd.conf:"
 sudo tail -n 5 /etc/vsftpd.conf
