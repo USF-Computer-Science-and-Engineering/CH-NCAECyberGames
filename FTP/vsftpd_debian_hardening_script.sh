@@ -118,7 +118,7 @@ echo -e "COMPLETE\n"
 
 # --- ENABLE VERBOSE LOGGING ---
 echo -e "\n[+] Enabling verbose logging"
-sudo sed -i "s|.*#xferlog_std_format=YES|xferlog_std_format=NO|g" /etc/vsftpd.conf
+sudo sed -i "s|.*xferlog_std_format=YES|xferlog_std_format=NO|g" /etc/vsftpd.conf
 echo -e "COMPLETE\n"
 
 
