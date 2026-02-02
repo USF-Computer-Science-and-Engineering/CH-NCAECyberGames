@@ -21,6 +21,12 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
+# --- ALLOW FTP FULL ACCESS IN SELINUX ---
+echo -e "\n[+] Setting allow_ftpd_full_access to true"
+sudo setsebool -P allow_ftpd_full_access 1
+echo -e "COMPLETE\n"
+# note: without this, file writes and directory listings will NOT work!
+
 # --- DISABLE ANONYMOUS USER IN CASE IT IS ENABLED ---
 echo -e "\n[+] Disabling Anonymous login. The other anonymous options"
 sudo sed -i "s|.*anonymous_enable.*|anonymous_enable=NO|g" /etc/vsftpd/vsftpd.conf
@@ -101,7 +107,7 @@ echo "[+] vsftpd.userlist contents:"
 sudo cat /etc/vsftpd/user_list
 echo -e "\n"
 
-echo "[+] Enabling full FTP logging in /etc/vsftpd.conf"
+echo "[+] Enabling full FTP logging in /etc/vsftpd/vsftpd.conf"
 echo "log_ftp_protocol=YES" >> /etc/vsftpd/vsftpd.conf
 echo -e "COMPELTE\n"
 
