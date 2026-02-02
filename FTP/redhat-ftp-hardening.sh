@@ -21,12 +21,6 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-# --- ALLOW FTP FULL ACCESS IN SELINUX ---
-echo -e "\n[+] Setting allow_ftpd_full_access to true"
-sudo setsebool -P allow_ftpd_full_access 1
-echo -e "COMPLETE\n"
-# note: without this, file writes and directory listings will NOT work!
-
 # --- DISABLE ANONYMOUS USER IN CASE IT IS ENABLED ---
 echo -e "\n[+] Disabling Anonymous login. The other anonymous options"
 sudo sed -i "s|.*anonymous_enable.*|anonymous_enable=NO|g" /etc/vsftpd/vsftpd.conf
@@ -91,7 +85,6 @@ else
 fi
 echo -e "COMPLETE\n"
 
-
 # --- READ AND APPEND USERLIST ENTRIES ---
 filename="$1"
 filepath=$(readlink -f "$filename")
@@ -107,6 +100,42 @@ echo -e "COMPLETE\n"
 echo "[+] vsftpd.userlist contents:"
 sudo cat /etc/vsftpd/user_list
 echo -e "\n"
+
+echo "[+] Enabling full FTP logging in /etc/vsftpd.conf"
+echo "log_ftp_protocol=YES" >> /etc/vsftpd/vsftpd.conf
+echo -e "COMPELTE\n"
+
+# --- ENFORCING LOGGING ---
+echo -e "\n[+] Making sure the log file is created and actually used"
+# check if xferlog_file already exists in the config file
+if grep -q "#xferlog_file" /etc/vsftpd/vsftpd.conf; then #case1: xferlog_file is commented out
+    # if it exists, change it to xferlog_file=/var/log/vsftpd.log
+    sudo sed -i "s|#xferlog_file=.*|xferlog_file=/var/log/vsftpd.log|g" /etc/vsftpd/vsftpd.conf
+    echo -e "edited vsftpd config to print logs to /var/log/vsftpd.log"
+elif grep -q "^[^#]*xferlog_file=" /etc/vsftpd/vsftpd.conf; then #case2: xferlog_file is already uncommented
+    sudo sed -i "s|xferlog_file=.*|xferlog_file=/var/log/vsftpd.log|g" /etc/vsftpd/vsftpd.conf
+    echo -e "edited vsftpd config to print logs to /var/log/vsftpd.log"
+else
+    # if it doesn't exist, add it at the end of the config file
+    echo "xferlog_file=/var/log/vsftpd.log" >> /etc/vsftpd/vsftpd.conf
+fi
+echo -e "COMPLETE\n"
+
+
+# --- ENABLE VERBOSE LOGGING ---
+echo -e "\n[+] Enabling verbose logging"
+# check if xferlog_std_format already exists in the config file
+if grep -q "#xferlog_std_format" /etc/vsftpd/vsftpd.conf; then #case1: where xferlog_std_format is commented out
+    # if it exists, change it to xferlog_file=/var/log/vsftpd.log
+    sudo sed -i "s|#xferlog_std_format=.*|xferlog_std_format=NO|g" /etc/vsftpd/vsftpd.conf
+    echo -e "edited vsftpd config to use a non standard xferlog format"
+elif grep -q "^[^#]*xferlog_std_format" /etc/vsftpd/vsftpd.conf; then #case 2: where xferlog_std_format is uncommented
+    sudo sed -i "s|xferlog_std_format=.*|xferlog_std_format=NO|g" /etc/vsftpd/vsftpd.conf
+else
+    # if it doesn't exist, add it at the end of the config file
+    echo "xferlog_std_format=NO" >> /etc/vsftpd/vsftpd.conf
+fi
+echo -e "COMPLETE\n"
 
 # --- ENABLE USERLIST IN VSFTPD CONFIGURATION ---
 echo "[+] Enabling userlist feature in /etc/vsftpd/vsftpd.conf"
