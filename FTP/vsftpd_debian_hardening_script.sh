@@ -108,17 +108,39 @@ echo -e "COMPLETE\n"
 
 # --- ENABLE FTP LOGGING IN CONFIG ---
 echo "[+] Enabling full FTP logging in /etc/vsftpd.conf"
-echo "log_ftp_protocol=YES" >> /etc/vsftpd.conf
+echo "log_ftp_protocol=YES" >> /etc/vsftpd.conf #ASSUMPTION: log_ftp_protocol is missing
 echo -e "COMPELTE\n"
 
 # --- ENFORCING LOGGING ---
 echo -e "\n[+] Making sure the log file is created and actually used"
-sudo sed -i "s|.*xferlog_file=/var/log/vsftpd.log|xferlog_file=/var/log/vsftpd.log|g" /etc/vsftpd.conf
+# check if xferlog_file already exists in the config file
+if grep -q "#xferlog_file" /etc/vsftpd.conf; then #case1: xferlog_file is commented out
+    # if it exists, change it to xferlog_file=/var/log/vsftpd.log
+    sudo sed -i "s|#xferlog_file=.*|xferlog_file=/var/log/vsftpd.log|g" /etc/vsftpd.conf
+    echo -e "edited vsftpd config to print logs to /var/log/vsftpd.log"
+elif grep -q "^[^#]*xferlog_file=" /etc/vsftpd.conf; then #case2: xferlog_file is already uncommented
+    sudo sed -i "s|xferlog_file=.*|xferlog_file=/var/log/vsftpd.log|g" /etc/vsftpd.conf
+    echo -e "edited vsftpd config to print logs to /var/log/vsftpd.log"
+else
+    # if it doesn't exist, add it at the end of the config file
+    echo "xferlog_file=/var/log/vsftpd.log" >> /etc/vsftpd.conf
+fi
 echo -e "COMPLETE\n"
+
 
 # --- ENABLE VERBOSE LOGGING ---
 echo -e "\n[+] Enabling verbose logging"
-sudo sed -i "s|.*xferlog_std_format=YES|xferlog_std_format=NO|g" /etc/vsftpd.conf
+# check if xferlog_std_format already exists in the config file
+if grep -q "#xferlog_std_format" /etc/vsftpd.conf; then #case1: where xferlog_std_format is commented out
+    # if it exists, change it to xferlog_file=/var/log/vsftpd.log
+    sudo sed -i "s|#xferlog_std_format=.*|xferlog_std_format=NO|g" /etc/vsftpd.conf
+    echo -e "edited vsftpd config to use a non standard xferlog format"
+elif grep -q "^[^#]*xferlog_std_format" /etc/vsftpd.conf; then #case 2: where xferlog_std_format is uncommented
+    sudo sed -i "s|xferlog_std_format=.*|xferlog_std_format=NO|g" /etc/vsftpd.conf
+else
+    # if it doesn't exist, add it at the end of the config file
+    echo "xferlog_std_format=NO" >> /etc/vsftpd.conf
+fi
 echo -e "COMPLETE\n"
 
 
