@@ -106,9 +106,21 @@ echo -e "userlist_enable=YES\nuserlist_file=/etc/vsftpd.userlist\nuserlist_deny=
 | sudo tee -a /etc/vsftpd.conf > /dev/null
 echo -e "COMPLETE\n"
 
+# --- ENABLE FTP LOGGING IN CONFIG ---
 echo "[+] Enabling full FTP logging in /etc/vsftpd.conf"
 echo "log_ftp_protocol=YES" >> /etc/vsftpd.conf
 echo -e "COMPELTE\n"
+
+# --- ENFORCING LOGGING ---
+echo -e "\n[+] Making sure the log file is created and actually used"
+sudo sed -i "s|.*xferlog_file=/var/log/vsftpd.log|xferlog_file=/var/log/vsftpd.log|g" /etc/vsftpd.conf
+echo -e "COMPLETE\n"
+
+# --- ENABLE VERBOSE LOGGING ---
+echo -e "\n[+] Enabling verbose logging"
+sudo sed -i "s|.*#xferlog_std_format=YES|xferlog_std_format=NO|g" /etc/vsftpd.conf
+echo -e "COMPLETE\n"
+
 
 # --- DISPLAY CONFIRMATION OF CONFIG UPDATE ---
 echo "[+] Last five lines of /etc/vsftpd.conf:"
