@@ -140,6 +140,19 @@ find_vsftpd_conf() {
     error "Cannot find vsftpd.conf. Is vsftpd installed?"
 }
 
+selinux_ftp_exception() {
+    # Check if the setsebool command exists
+    if command -v setsebool &> /dev/null
+    then
+        # Run the command if setsebool exists
+        setsebool -P allow_ftpd_full_access 1
+        echo "Successfully set FTP exception in SELINUX."
+    else
+        # Print a message if setsebool is not found
+        echo "setsebool command not found on this system."
+    fi
+}
+
 # ---------------------------
 # Idempotent config setter
 # ---------------------------
@@ -165,6 +178,7 @@ remove_conf() {
 # ======================================================================
 install_vsftpd
 find_vsftpd_conf
+selinux_ftp_exception
 
 # --- Backup original config ---
 BACKUP="${VSFTPD_CONF}.bak.$(date +%Y%m%d%H%M%S)"
@@ -317,7 +331,7 @@ harden_chroot_dir() {
 
     # Chroot root must be owned by root and not writable
     chown root:ftp_users "$dir"
-    chmod 0755 "$dir"
+    chmod 0775 "$dir"
 
     # Writable subdirectory for uploads
     local upload_dir="$dir/uploads"
@@ -333,7 +347,7 @@ harden_chroot_dir() {
     find "$dir" -mindepth 1 -type f -exec chown root:ftp_users {} + -exec chmod 0664 {} +
 
     # Re-enforce chroot root (find -mindepth 1 won't touch it, but be safe)
-    chmod 0755 "$dir"
+    chmod 0775 "$dir"
 }
 
 if [[ "$CHROOT_MODE" == "shared" ]]; then
@@ -417,16 +431,23 @@ fi
 # ---------------------------
 info "Applying additional hardening..."
 # Remove obsolete tcp_wrappers (removed in vsftpd 3.0+, can cause startup failure)
-remove_conf "tcp_wrappers"
+#remove_conf "tcp_wrappers"
 
 set_conf "ls_recurse_enable"    "NO"
-set_conf "local_umask"          "027"
+set_conf "local_umask"          "007"
 set_conf "file_open_mode"       "0640"
 set_conf "hide_ids"             "YES"       # show "ftp" instead of real uid/gid
 set_conf "max_per_ip"           "3"         # limit concurrent connections per IP
 set_conf "idle_session_timeout" "300"
 set_conf "data_connection_timeout" "120"
 set_conf "seccomp_sandbox"      "YES"       # restrict syscalls via seccomp
+
+# ---------------------------
+# 13. Enable writeable chroot
+# ---------------------------
+info "Enabling writeable chroot..."
+set_conf "allow_writeable_chroot"    "YES"
+
 
 # ---------------------------
 # Done — restart service
