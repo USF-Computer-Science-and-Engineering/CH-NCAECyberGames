@@ -242,7 +242,7 @@ else
 fi
 
 info "Configuring chroot ($CHROOT_MODE)..."
-set_conf "chroot_local_user" "YES"
+set_conf "chroot_local_user" "NO"
 remove_conf "allow_writeable_chroot"
 
 if [[ "$CHROOT_MODE" == "shared" ]]; then
@@ -331,7 +331,7 @@ harden_chroot_dir() {
 
     # Chroot root must be owned by root and not writable
     chown root:ftp_users "$dir"
-    chmod 0775 "$dir"
+    chmod 2775 "$dir"
 
     # Writable subdirectory for uploads
     local upload_dir="$dir/uploads"
@@ -347,7 +347,7 @@ harden_chroot_dir() {
     find "$dir" -mindepth 1 -type f -exec chown root:ftp_users {} + -exec chmod 0664 {} +
 
     # Re-enforce chroot root (find -mindepth 1 won't touch it, but be safe)
-    chmod 0775 "$dir"
+    chmod 2775 "$dir"
 }
 
 if [[ "$CHROOT_MODE" == "shared" ]]; then
