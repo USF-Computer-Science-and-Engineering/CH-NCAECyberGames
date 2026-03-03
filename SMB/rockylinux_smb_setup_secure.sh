@@ -32,3 +32,9 @@ echo -e "INFO: added samba to firewall allow"
 echo -e "INFO: sync user passwords to smbpasswd!"
 
 echo -e "INFO: If smb root isn't configured already, chown it to nobody:smb_users and then chmod it to 770"
+
+# create zip archive backup of samba sensitive files
+zip -r samba_backup.zip /etc/samba /var/lib/samba #saves in current dir
+echo -e "INFO: created backup of sensitive samba files. SCP THESE TO BACKUP SERVER IMMEDIATELY!"
+cp samba_backup.zip /root 
+echo -e "INFO: local backup saved"
