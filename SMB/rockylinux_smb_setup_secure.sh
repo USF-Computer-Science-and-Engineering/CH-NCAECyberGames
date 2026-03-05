@@ -38,3 +38,6 @@ zip -r samba_backup.zip /etc/samba /var/lib/samba #saves in current dir
 echo -e "INFO: created backup of sensitive samba files. SCP THESE TO BACKUP SERVER IMMEDIATELY!"
 cp samba_backup.zip /root 
 echo -e "INFO: local backup saved"
+
+systemctl restart smb nmb
+systemctl status smb nmb
