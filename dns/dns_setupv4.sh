@@ -42,6 +42,9 @@ ZONE_DIR="/var/named/zones"
 LOG_DIR="/var/log/named"
 
 mkdir -p "$ZONE_DIR"
+chown named:named "$ZONE_DIR"
+chmod 750 "$ZONE_DIR"
+
 mkdir -p "$LOG_DIR"
 
 ################################
@@ -240,6 +243,14 @@ options {
     allow-transfer { none; };
 
     dnssec-validation no;
+	
+	minimal-responses yes;
+	
+	rate-limit {
+        responses-per-second 50;
+    };
+	
+	version "not disclosed";
 
     pid-file "/run/named/named.pid";
 };
